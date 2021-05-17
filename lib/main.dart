@@ -3,6 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'Views/kontoInfoSide.dart';
 import 'Views/createKonto.dart';
+import 'package:provider/provider.dart';
+
 import 'Models/Account.dart';
 import 'Models/Kind.dart';
 import 'Models/Transaction.dart';
@@ -12,13 +14,17 @@ void main() async {
   await Firebase.initializeApp();
 
   runApp(MaterialApp(
-    title: 'Bank App',
-    theme: ThemeData(
-      primarySwatch: Colors.grey,
-    ),
-    home: MyApp(),
-  ));
+      title: 'Bank App',
+      theme: ThemeData(
+        primarySwatch: Colors.grey,
+      ),
+      home: ChangeNotifierProvider(
+        create: (_) => CurrentKonto(),
+        child: MyApp(),
+      )));
 }
+
+mixin _currentKonto {}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -55,9 +61,6 @@ class KontoList extends StatelessWidget {
     final CollectionReference konti =
         FirebaseFirestore.instance.collection('Account');
 
-    final CollectionReference transactionsToKonti =
-        FirebaseFirestore.instance.collection('Transaction');
-
     return Container(
       child: Scaffold(
           appBar: AppBar(
@@ -92,6 +95,8 @@ class KontoList extends StatelessWidget {
                       title: Text(snapshot.data!.docs[index]['name']),
                       subtitle: Text(snapshot.data!.docs[index]['iban']),
                       onTap: () {
+                        Provider.of<CurrentKonto>(context, listen: false)
+                            .changeIban(snapshot.data!.docs[index]['iban']);
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) {
                           return KontoInfoSide();
@@ -102,5 +107,13 @@ class KontoList extends StatelessWidget {
             },
           )),
     );
+  }
+}
+
+class CurrentKonto extends ChangeNotifier {
+  String iban = 'unknown';
+  void changeIban(String iban) {
+    this.iban = iban;
+    notifyListeners();
   }
 }
