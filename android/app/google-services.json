@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1058315349719",
+    "project_id": "mobile-eksamen",
+    "storage_bucket": "mobile-eksamen.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1058315349719:android:2d099f6c498278723e0a92",
+        "android_client_info": {
+          "package_name": "com.example.mobile_eksamen_opg"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1058315349719-27ns0llc66meq2dklieeikte36ucnqmr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFiLB59zzn9QKtkHsbPm0d3nRVISBNk2o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1058315349719-27ns0llc66meq2dklieeikte36ucnqmr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
