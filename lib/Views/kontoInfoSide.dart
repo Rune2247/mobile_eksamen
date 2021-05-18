@@ -4,21 +4,22 @@ import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import './newTransaction.dart';
 import '../main.dart';
+import '../dbService.dart';
 
 class KontoInfoSide extends StatelessWidget {
   final String iban;
 
   KontoInfoSide({Key? key, required this.iban}) : super(key: key);
+  DBservice dBservice = new DBservice();
 
-  final CollectionReference transactions =
-      FirebaseFirestore.instance.collection('Transaction');
   @override
   Widget build(BuildContext context) {
+    dBservice.getAccountBalance(iban);
     return Container(
       child: Scaffold(
         appBar: AppBar(
           //Vis IBAN i title
-          title: Text('detail page ' + iban),
+          title: Text('detail page for iban:' + iban),
           actions: [
             FloatingActionButton(onPressed: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -30,7 +31,7 @@ class KontoInfoSide extends StatelessWidget {
           ],
         ),
         body: StreamBuilder<QuerySnapshot>(
-            stream: transactions.snapshots(),
+            stream: dBservice.transferStreamForAccount(iban),
             builder:
                 (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.hasError) {

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_eksamen_opg/Models/Account.dart';
+import 'package:mobile_eksamen_opg/dbService.dart';
 
 class CreateKonto extends StatelessWidget {
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
@@ -42,8 +43,7 @@ class _CreateFormState extends State<CreateForm> {
 
   @override
   Widget build(BuildContext context) {
-    final CollectionReference kind =
-        FirebaseFirestore.instance.collection('Kind');
+    DBservice dBservice = new DBservice();
 
     String _kind = 'Andet';
 
@@ -51,7 +51,7 @@ class _CreateFormState extends State<CreateForm> {
       child: Scaffold(
         appBar: AppBar(),
         body: StreamBuilder<QuerySnapshot>(
-            stream: kind.snapshots(),
+            stream: dBservice.kindStream(),
             builder:
                 (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.hasError) {
@@ -76,31 +76,6 @@ class _CreateFormState extends State<CreateForm> {
                       ),
                     ),
 
-                    Container(
-                        child: Expanded(
-                      child: ListWheelScrollView.useDelegate(
-                        itemExtent: 75,
-                        useMagnifier: true,
-                        magnification: 1.05,
-                        onSelectedItemChanged: (index) => {
-                          setState(() {
-                            _kind = snapshot.data!.docs[index]['name'];
-                            print(_kind);
-                          })
-                        },
-                        childDelegate: ListWheelChildBuilderDelegate(
-                            childCount: snapshot.data!.docs.length,
-                            builder: (context, index) {
-                              return Center(
-                                child: ListTile(
-                                  title:
-                                      Text(snapshot.data!.docs[index]['name']),
-                                ),
-                              );
-                            }),
-                      ),
-                    )),
-
                     Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16.0),
                         child: FloatingActionButton(
@@ -109,10 +84,11 @@ class _CreateFormState extends State<CreateForm> {
                             CollectionReference kindList = FirebaseFirestore
                                 .instance
                                 .collection('Account');
+                            int number = await dBservice.newAcountNumber();
                             await kindList.add({
                               'name': nameController.text,
                               'kind': _kind,
-                              'iban': '124578',
+                              'iban': number.toString(),
                             });
                             Navigator.pop(context);
                           },

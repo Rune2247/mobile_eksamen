@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'Views/kontoInfoSide.dart';
 import 'Views/createKonto.dart';
 import 'package:provider/provider.dart';
+import 'dbService.dart';
 
 import 'Models/Account.dart';
 import 'Models/Kind.dart';
@@ -56,8 +57,7 @@ class KontoList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final CollectionReference konti =
-        FirebaseFirestore.instance.collection('Account');
+    DBservice dBservice = new DBservice();
 
     return Container(
       child: Scaffold(
@@ -75,7 +75,7 @@ class KontoList extends StatelessWidget {
             ],
           ),
           body: StreamBuilder<QuerySnapshot>(
-            stream: konti.snapshots(),
+            stream: dBservice.accountStream(),
             builder:
                 (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.hasError) {
@@ -92,9 +92,17 @@ class KontoList extends StatelessWidget {
                     return ListTile(
                       title: Text(snapshot.data!.docs[index]['name']),
                       subtitle: Text(snapshot.data!.docs[index]['iban']),
+                      trailing: FutureBuilder(
+                        future: dBservice.getAccountBalance(
+                            snapshot.data!.docs[index]['iban']),
+                        builder: (context, snapshot) {
+                          return Text(snapshot.data.toString());
+                        },
+                      ),
                       onTap: () {
                         Provider.of<CurrentKonto>(context, listen: false)
                             .changeIban(snapshot.data!.docs[index]['iban']);
+
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) {
                           return KontoInfoSide(

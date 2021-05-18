@@ -36,9 +36,9 @@ class NewTransactionPage extends StatelessWidget {
                     CollectionReference users =
                         FirebaseFirestore.instance.collection('Transaction');
                     await users.add({
-                      'amount': amountController.text,
+                      'amount': int.parse(amountController.text),
                       'beneficiary': companyController.text,
-                      'creationDate': DateTime.now(),
+                      'creationDate': DateTime.now().day.toString(),
                       'iban': iban
                     });
                     Navigator.pop(context);
