@@ -1,10 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mobile_eksamen_opg/Models/Transaction.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import './newTransaction.dart';
 import '../main.dart';
 
 class KontoInfoSide extends StatelessWidget {
-  KontoInfoSide({Key? key}) : super(key: key);
+  final String iban;
+
+  KontoInfoSide({Key? key, required this.iban}) : super(key: key);
 
   final CollectionReference transactions =
       FirebaseFirestore.instance.collection('Transaction');
@@ -14,7 +18,16 @@ class KontoInfoSide extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           //Vis IBAN i title
-          title: Text('detail page ' + Provider.of<CurrentKonto>(context).iban),
+          title: Text('detail page ' + iban),
+          actions: [
+            FloatingActionButton(onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return NewTransactionPage(
+                  iban: iban,
+                );
+              }));
+            })
+          ],
         ),
         body: StreamBuilder<QuerySnapshot>(
             stream: transactions.snapshots(),
@@ -28,15 +41,25 @@ class KontoInfoSide extends StatelessWidget {
                   child: CircularProgressIndicator(),
                 );
               }
-              return ListView.builder(
+              return Container(
+                  child: ListView.builder(
                 itemCount: snapshot.data!.docs.length,
-                itemBuilder: (ctx, index) {
-                  return ListTile(
-                    title: Text(snapshot.data?.docs[index]['beneficiary']),
-                    subtitle: Text("${snapshot.data?.docs[index]['amount']}"),
-                  );
+                itemBuilder: (context, index) {
+                  if (iban == snapshot.data!.docs[index]['iban']) {
+                    return ListTile(
+                      title: Text(snapshot.data!.docs[index]['beneficiary']),
+                      subtitle:
+                          Text(snapshot.data!.docs[index]['creationDate']),
+                      trailing: Text(
+                          snapshot.data!.docs[index]['amount'].toString() +
+                              " Kr"),
+                    );
+                  } else
+                    return ListTile(
+                      title: Text('Ikke din!'),
+                    );
                 },
-              );
+              ));
             }),
       ),
     );

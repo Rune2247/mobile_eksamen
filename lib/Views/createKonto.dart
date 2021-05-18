@@ -84,8 +84,8 @@ class _CreateFormState extends State<CreateForm> {
                         magnification: 1.05,
                         onSelectedItemChanged: (index) => {
                           setState(() {
-                            _kind = snapshot.data!.docs[index]['kind'];
-                            print(index);
+                            _kind = snapshot.data!.docs[index]['name'];
+                            print(_kind);
                           })
                         },
                         childDelegate: ListWheelChildBuilderDelegate(

@@ -24,8 +24,6 @@ void main() async {
       )));
 }
 
-mixin _currentKonto {}
-
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
@@ -99,7 +97,8 @@ class KontoList extends StatelessWidget {
                             .changeIban(snapshot.data!.docs[index]['iban']);
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) {
-                          return KontoInfoSide();
+                          return KontoInfoSide(
+                              iban: snapshot.data!.docs[index]['iban']);
                         }));
                       },
                     );
