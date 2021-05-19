@@ -1,11 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:mobile_eksamen_opg/Models/Transaction.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import './newTransaction.dart';
-import '../main.dart';
 import '../dbService.dart';
 
+// ignore: must_be_immutable
 class KontoInfoSide extends StatelessWidget {
   final String iban;
 
@@ -21,13 +20,21 @@ class KontoInfoSide extends StatelessWidget {
           //Vis IBAN i title
           title: Text('detail page for iban:' + iban),
           actions: [
-            FloatingActionButton(onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return NewTransactionPage(
-                  iban: iban,
-                );
-              }));
-            })
+            FloatingActionButton(
+                child: Icon(
+                  Icons.add_circle,
+                  color: Colors.black,
+                  size: 30.0,
+                ),
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return ChangeNotifierProvider(
+                        create: (_) => Status(),
+                        child: NewTransactionPage(
+                          iban: iban,
+                        ));
+                  }));
+                })
           ],
         ),
         body: StreamBuilder<QuerySnapshot>(
@@ -51,9 +58,8 @@ class KontoInfoSide extends StatelessWidget {
                       title: Text(snapshot.data!.docs[index]['beneficiary']),
                       subtitle:
                           Text(snapshot.data!.docs[index]['creationDate']),
-                      trailing: Text(
-                          snapshot.data!.docs[index]['amount'].toString() +
-                              " Kr"),
+                      trailing: Text("Kr. " +
+                          snapshot.data!.docs[index]['amount'].toString()),
                     );
                   } else
                     return ListTile(

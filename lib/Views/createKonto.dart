@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_eksamen_opg/Models/Account.dart';
+
 import 'package:mobile_eksamen_opg/dbService.dart';
 
 class CreateKonto extends StatelessWidget {
@@ -40,16 +40,43 @@ class CreateForm extends StatefulWidget {
 class _CreateFormState extends State<CreateForm> {
   final _formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
+  final kindController = FixedExtentScrollController();
+  String kindWheelValue = '';
 
   @override
   Widget build(BuildContext context) {
     DBservice dBservice = new DBservice();
 
-    String _kind = 'Andet';
-
     return Container(
       child: Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+          actions: [
+            FloatingActionButton(
+              child: Icon(
+                Icons.add_business_rounded,
+                color: Colors.black,
+                size: 30.0,
+              ),
+              onPressed: () async {
+                if (nameController.text == '' ||
+                    nameController.text.isEmpty ||
+                    kindWheelValue == '' ||
+                    nameController.text.isEmpty) {
+                } else {
+                  CollectionReference kindList =
+                      FirebaseFirestore.instance.collection('Account');
+                  int number = await dBservice.newAcountNumber();
+                  await kindList.add({
+                    'name': nameController.text,
+                    'kind': kindWheelValue,
+                    'iban': number.toString(),
+                  });
+                  Navigator.pop(context);
+                }
+              },
+            ),
+          ],
+        ),
         body: StreamBuilder<QuerySnapshot>(
             stream: dBservice.kindStream(),
             builder:
@@ -64,36 +91,51 @@ class _CreateFormState extends State<CreateForm> {
               }
               return Form(
                   key: _formKey,
-                  child: Column(children: [
-                    //
-                    Container(
-                      child: TextFormField(
-                        controller: nameController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Name',
-                        ),
-                      ),
-                    ),
+                  child: SingleChildScrollView(
+                      child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                              maxHeight: MediaQuery.of(context).size.height),
+                          child: Column(
+                            children: [
+                              //
+                              Container(
+                                child: TextFormField(
+                                  controller: nameController,
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    labelText: 'Name',
+                                  ),
+                                ),
+                              ),
 
-                    Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        child: FloatingActionButton(
-                          child: Text('Create Konto'),
-                          onPressed: () async {
-                            CollectionReference kindList = FirebaseFirestore
-                                .instance
-                                .collection('Account');
-                            int number = await dBservice.newAcountNumber();
-                            await kindList.add({
-                              'name': nameController.text,
-                              'kind': _kind,
-                              'iban': number.toString(),
-                            });
-                            Navigator.pop(context);
-                          },
-                        )),
-                  ]));
+                              Container(
+                                  child: Expanded(
+                                child: ListWheelScrollView.useDelegate(
+                                  itemExtent: 75,
+                                  useMagnifier: true,
+                                  magnification: 1.03,
+                                  diameterRatio: 1,
+                                  controller: kindController,
+                                  physics: FixedExtentScrollPhysics(),
+                                  onSelectedItemChanged: (index) => {
+                                    kindWheelValue =
+                                        snapshot.data!.docs[index]['name'],
+                                  },
+                                  childDelegate: ListWheelChildBuilderDelegate(
+                                      childCount: snapshot.data!.docs.length,
+                                      builder: (context, index) {
+                                        return Center(
+                                          child: ListTile(
+                                            title: Text(snapshot
+                                                .data!.docs[index]['name']),
+                                          ),
+                                        );
+                                      }),
+                                ),
+                              )),
+                              Text('data'),
+                            ],
+                          ))));
             }),
       ),
     );

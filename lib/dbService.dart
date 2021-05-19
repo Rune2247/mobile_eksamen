@@ -37,4 +37,14 @@ class DBservice {
 
     return sum;
   }
+
+  Future<bool> checkBalanceOverZero(String iban, int newAmount) async {
+    int balance = await getAccountBalance(iban);
+    if (newAmount + balance < 0) {
+      print('False ${newAmount + balance}');
+      return false;
+    }
+    print('True ${newAmount + balance}');
+    return true;
+  }
 }

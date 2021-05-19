@@ -1,4 +1,3 @@
-import 'Kind.dart';
 import 'Transaction.dart';
 
 class Account {
